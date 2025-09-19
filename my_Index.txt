@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FishCity — магазин рыболовных товаров (прототип)</title>
+  <meta name="description" content="Интернет-магазин рыболовных товаров — блочная структура, карточки товаров, корзина. Прототип." />
+  <!-- Google Fonts (заменить при желании) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fafafa;
+      --card:#ffffff;
+      --accent:#0a84ff;
+      --muted:#6b6b6b;
+      --radius:12px;
+      --max-width:1100px;
+      --gap:18px;
+      --shadow: 0 6px 20px rgba(10,10,10,0.06);
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:linear-gradient(180deg,#f6fbff 0%, var(--bg) 100%);
+      color:#111;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+    }
+    .container{max-width:var(--max-width);margin:0 auto;padding:28px;}
+    header{
+      position:sticky;top:0;background:rgba(255,255,255,0.85);backdrop-filter: blur(6px);z-index:50;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    }
+    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:var(--max-width);margin:0 auto;padding:14px 20px;}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;}
+    .logo{
+      width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#6dd3ff);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px;box-shadow:var(--shadow);
+    }
+    nav{display:flex;gap:18px;align-items:center}
+    nav a{color:var(--muted);text-decoration:none;padding:8px;border-radius:8px;font-weight:500}
+    nav a:hover{color:var(--accent)}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:600;cursor:pointer;
+    }
+    .ghost{
+      background:transparent;border:1px solid rgba(10,10,10,0.06);color:var(--muted);padding:9px 12px;border-radius:10px;
+    }
+
+    /* Hero */
+    .hero{padding:44px 20px;background:linear-gradient(90deg, rgba(10,132,255,0.06), rgba(13,180,255,0.03));border-radius:18px;margin:22px 0;display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:center;box-shadow:var(--shadow)}
+    .hero-left h1{font-size:28px;margin:0 0 12px}
+    .lead{color:var(--muted);margin-bottom:18px}
+    .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{background:#e7f3ff;color:var(--accent);padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px;display:inline-block}
+
+    /* Categories */
+    .cats{display:flex;gap:12px;margin:18px 0;flex-wrap:wrap}
+    .cat{background:var(--card);padding:10px 12px;border-radius:12px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center;min-width:140px;cursor:pointer}
+    .cat img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+
+    /* Products */
+    .products{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:18px}
+    @media (max-width:980px){.hero{grid-template-columns:1fr;}.products{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:620px){.products{grid-template-columns:1fr}.header-inner{padding:12px}.hero{padding:18px}.hero-left h1{font-size:22px}}
+
+    .card{background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+    .card .img{height:170px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f3f6fb}
+    .card img{width:100%;height:100%;object-fit:cover;display:block}
+    .price{font-weight:700;color:var(--accent);font-size:16px}
+    .meta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+
+    /* Benefits */
+    .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+    .benefit{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start}
+
+    /* Footer */
+    footer{margin-top:32px;padding:28px 0;color:var(--muted);font-size:14px;text-align:center}
+
+    /* Modal & cart */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:60}
+    .modal{background:white;border-radius:12px;max-width:900px;width:100%;padding:18px;box-shadow:var(--shadow)}
+    .cart-bubble{background:#ff4d6d;color:white;border-radius:999px;padding:4px 8px;font-weight:700;font-size:12px;margin-left:6px}
+
+    /* small helpers */
+    .muted{color:var(--muted)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .center{display:flex;align-items:center;justify-content:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner" role="navigation" aria-label="Основная навигация">
+      <a class="brand" href="#" aria-label="На главную">
+        <div class="logo" aria-hidden="true">FC</div>
+        <div>
+          <div style="font-weight:700">FishCity</div>
+          <div class="muted" style="font-size:13px">Рыболовные товары</div>
+        </div>
+      </a>
+
+      <nav aria-label="Меню сайта">
+        <a href="#catalog">Каталог</a>
+        <a href="#about">О магазине</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+
+      <div class="actions">
+        <button class="ghost" id="searchBtn" aria-label="Поиск">Поиск</button>
+        <button class="btn" id="cartBtn" aria-haspopup="dialog" aria-controls="cartModal">
+          Корзина <span id="cartCount" class="cart-bubble" aria-hidden="true">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="top">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-left">
+        <div class="badge">Сделано в России</div>
+        <h1 id="heroTitle">Крупный ассортимент для рыбалки — быстро и удобно</h1>
+        <p class="lead">Катушки, удилища, приманки и всё необходимое для улова. Доставляем по всей России. Низкие цены и гарантия качества.</p>
+        <div class="hero-cta">
+          <button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Перейти в каталог</button>
+          <button class="ghost" onclick="alert('Позвоните: +7 (900) 000-00-00')">Позвонить</button>
+        </div>
+
+        <div style="margin-top:16px" class="muted">Быстрый заказ и комплексная консультация — свяжись с нами</div>
+      </div>
+
+      <aside>
+        <!-- placeholder hero image -->
+        <div style="border-radius:12px;overflow:hidden;box-shadow:var(--shadow)">
+          <img src="https://images.unsplash.com/photo-1504274066651-8d31a536b11a?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000" alt="Рыбалка" style="width:100%;display:block;height:320px;object-fit:cover" loading="lazy">
+        </div>
+      </aside>
+    </section>
+
+    <!-- Categories -->
+    <section aria-label="Категории">
+      <h2 style="margin:8px 0 12px">Категории</h2>
+      <div class="cats" id="categories">
+        <!-- динамически -->
+      </div>
+    </section>
+
+    <!-- Catalog -->
+    <section id="catalog" aria-labelledby="catalogTitle">
+      <h2 id="catalogTitle" style="margin-top:22px">Популярные товары</h2>
+      <div class="products" id="productGrid" role="list">
+        <!-- карточки -->
+      </div>
+      <div style="margin-top:14px;text-align:center">
+        <button class="ghost" onclick="loadMore()">Показать ещё</button>
+      </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="benefits" id="about" aria-labelledby="aboutTitle">
+      <div class="benefit">
+        <div style="font-size:28px">🚚</div>
+        <div>
+          <div style="font-weight:700">Доставка по всей стране</div>
+          <div class="muted">Сроки 1–5 рабочих дней. Быстрая обработка заказа.</div>
+        </div>
+      </div>
+      <div class="benefit">
+        <div style="font-size:28px">🔧</div>
+        <div>
+          <div style="font-weight:700">Гарантия и поддержка</div>
+          <div class="muted">Замена или возврат в течение 14 дней.</div>
+        </div>
+      </div>
+      <div class="benefit">
+        <div style="font-size:28px">💳</div>
+        <div>
+          <div style="font-weight:700">Удобные способы оплаты</div>
+          <div class="muted">Карта, Apple Pay, Google Pay, наличные при доставке.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews -->
+    <section aria-label="Отзывы">
+      <h3 style="margin-top:8px">Отзывы покупателей</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+        <blockquote class="card" style="min-width:220px">
+          <div style="font-weight:700">Алексей</div>
+          <div class="muted" style="margin:8px 0">Большой выбор приманок, доставка за 2 дня. Советую!</div>
+        </blockquote>
+        <blockquote class="card" style="min-width:220px">
+          <div style="font-weight:700">Марина</div>
+          <div class="muted" style="margin:8px 0">Консультанты помогли подобрать снасти для моря. Спасибо.</div>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- Contacts -->
+    <section id="contacts" style="margin-top:22px" aria-labelledby="contactsTitle">
+      <h3 id="contactsTitle">Контакты</h3>
+      <div class="grid-2" style="margin-top:10px">
+        <div class="card">
+          <div style="font-weight:700">Свяжитесь с нами</div>
+          <div class="muted" style="margin-top:6px">Телефон: +7 (900) 000-00-00</div>
+          <div class="muted">E-mail: info@fishcity.example</div>
+          <form id="contactForm" style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+            <input type="text" id="name" placeholder="Имя" required style="padding:10px;border-radius:8px;border:1px solid #eee">
+            <input type="tel" id="phone" placeholder="Телефон" required style="padding:10px;border-radius:8px;border:1px solid #eee">
+            <button type="submit" class="btn">Отправить</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700">Режим работы</div>
+          <div class="muted" style="margin-top:6px">Пн–Пт: 9:00–18:00</div>
+          <div class="muted">Сб: 10:00–15:00</div>
+          <div class="muted">Вс: выходной</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> FishCity — прототип лендинга. Все изображения — примеры. Контент заменяем.
+    </footer>
+  </main>
+
+  <!-- Modal backdrop (for product details or cart) -->
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal" role="document" id="modalContent">
+      <!-- content injected by JS -->
+    </div>
+  </div>
+
+  <script>
+    // --- Простая демонстрация данных (замени на fetch('/api/products') при интеграции) ---
+    const categories = [
+      {id:'udilishcha', title:'Удилища', img:'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=000'},
+      {id:'primanki', title:'Приманки', img:'https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=000'},
+      {id:'katushki', title:'Катушки', img:'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=000'}
+    ];
+
+    const productsDB = [
+      {id:1,title:'Набор приманок «Strike Pack»', price:1290, img:'https://images.unsplash.com/photo-1601758123927-1d03b1d5a2d7?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000', desc:'Универсальный набор для спиннинга.'},
+      {id:2,title:'Катушка ProSpin 3000', price:3890, img:'https://images.unsplash.com/photo-1531066668108-6b7e1a1d9fdd?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000', desc:'Лёгкая и надёжная катушка для пресной воды.'},
+      {id:3,title:'Удилище CarbonX 2.4m', price:4990, img:'https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000', desc:'Быстрый строй, идеальное для джиговой ловли.'},
+      {id:4,title:'Леска StrongLine 0.20mm', price:490, img:'https://images.unsplash.com/photo-1526269365704-6b3b6c3c4e26?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000', desc:'Прочная леска с низкой памятью.'},
+      {id:5,title:'Набор крючков Profi 50шт', price:350, img:'https://images.unsplash.com/photo-1582719478179-6d8e15e5d5b0?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000', desc:'Комплект крючков для разного вида рыбы.'},
+      {id:6,title:'Сумка рыболова Compact', price:2190, img:'https://images.unsplash.com/photo-1533873984002-4b5f8e3e0c1d?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=000', desc:'Удобная сумка с множеством карманов.'}
+    ];
+
+    // cart
+    let cart = [];
+
+    // utils
+    function $(s){return document.querySelector(s)}
+    function createEl(tag, attrs={}, children=[]){
+      const el = document.createElement(tag);
+      for(const k in attrs){
+        if(k.startsWith('on') && typeof attrs[k] === 'function') el.addEventListener(k.slice(2), attrs[k]);
+        else if(k==='html') el.innerHTML = attrs[k];
+        else el.setAttribute(k, attrs[k]);
+      }
+      children.forEach(c => el.appendChild(c));
+      return el;
+    }
+
+    // render categories
+    const catsWrap = $('#categories');
+    categories.forEach(c=>{
+      const card = createEl('div',{class:'cat', role:'button', tabindex:0, onclick: ()=> filterByCategory(c.id)},[
+        createEl('img',{src:c.img, alt:c.title, loading:'lazy'}),
+        createEl('div',{html:<div style="font-weight:700">${c.title}</div><div class="muted" style="font-size:13px">Выбрать</div>})
+      ]);
+      catsWrap.appendChild(card);
+    });
+
+    // render products
+    const productGrid = $('#productGrid');
+    let currentProducts = [...productsDB]; // копия
+    let displayCount = 6;
+
+    function renderProducts(){
+      productGrid.innerHTML = '';
+      const list = currentProducts.slice(0, displayCount);
+      list.forEach(p=>{
+        const card = createEl('article',{class:'card',role:'listitem'},[
+          createEl('div',{class:'img'},[ createEl('img',{src:p.img, alt:p.title, loading:'lazy'}) ]),
+          createEl('div',{html:<div style="font-weight:700">${p.title}</div><div class="muted" style="font-size:13px;margin-top:6px">${p.desc}</div>}),
+          createEl('div',{class:'meta'},[
+            createEl('div',{class:'price',html:${p.price.toLocaleString('ru-RU')} ₽}),
+            createEl('div',{},[
+              createEl('button',{class:'ghost',onclick:()=> openModal(p.id), ariaLabel:'Подробнее'}, [document.createTextNode('Подробнее')]),
+              createEl('button',{class:'btn',onclick:()=> addToCart(p.id), style:'margin-left:8px'}, [document.createTextNode('Купить')])
+            ])
+          ])
+        ]);
+        productGrid.appendChild(card);
+      });
+    }
+
+    function loadMore(){
+      displayCount += 6;
+      renderProducts();
+    }
+
+    // filter by fake category (demo)
+    function filterByCategory(catId){
+      // демо: фильтруем по наличию слова в названии
+      currentProducts = productsDB.filter(p => p.title.toLowerCase().includes(catId === 'primanki' ? 'приман' : catId === 'katushki' ? 'катуш' : 'удилищ' ) );
+      if(currentProducts.length === 0) currentProducts = productsDB; // fallback
+      displayCount = 6;
+      renderProducts();
+      document.getElementById('catalog').scrollIntoView({behavior:'smooth'});
+    }
+
+    // modal
+    const backdrop = $('#modalBackdrop');
+    const modalContent = $('#modalContent');
+
+    function openModal(productId){
+      const p = productsDB.find(x=>x.id===productId);
+      modalContent.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><img src="${p.img}" alt="${p.title}" style="width:100%;height:320px;object-fit:cover;border-radius:8px" loading="lazy"></div>
+          <div>
+            <h3 style="margin-top:0">${p.title}</h3>
+            <div class="muted">${p.desc}</div>
+            <div style="margin:12px 0;font-weight:800;font-size:20px;color:var(--accent)">${p.price.toLocaleString('ru-RU')} ₽</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn" onclick="addToCart(${p.id}); closeModal()">Добавить в корзину</button>
+              <button class="ghost" onclick="closeModal()">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      `;
+      backdrop.style.display='flex';
+      backdrop.setAttribute('aria-hidden','false');
+    }
+
+    function closeModal(){
+      backdrop.style.display='none';
+      backdrop.setAttribute('aria-hidden','true');
+      modalContent.innerHTML='';
+    }
+
+    backdrop.addEventListener('click', (e)=> {
+      if(e.target === backdrop) closeModal();
+    });
+
+    // cart functions
+    function addToCart(id){
+      const item = productsDB.find(p=>p.id===id);
+      const found = cart.find(c=>c.id===id);
+      if(found) found.qty++;
+      else cart.push({id:item.id, title:item.title, price:item.price, qty:1});
+      updateCartUI();
+      flashCart();
+    }
+
+    function updateCartUI(){
+      $('#cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
+    }
+
+    function flashCart(){
+      const el = $('#cartCount');
+      el.style.transform='scale(1.08)';
+      setTimeout(()=>el.style.transform='scale(1)',200);
+    }
+
+    // cart modal
+    $('#cartBtn').addEventListener('click', ()=>{
+      let html = '<h3>Корзина</h3>';
+      if(cart.length===0) html += '<div class="muted" style="margin-top:12px">Ваша корзина пока пуста.</div>';
+      else {
+        html += '<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">';
+        cart.forEach(ci=>{
+          html += <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${ci.title}</strong><div class="muted" style="font-size:13px">${ci.qty} шт.</div></div><div style="text-align:right">${(ci.price*ci.qty).toLocaleString('ru-RU')} ₽<div style="margin-top:6px"><button class="ghost" onclick="removeFromCart(${ci.id})">Удалить</button></div></div></div>;
+        });
+        const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+        html += </div><div style="margin-top:12px;font-weight:800">Итого: ${total.toLocaleString('ru-RU')} ₽</div>;
+        html += <div style="margin-top:12px;display:flex;gap:8px"><button class="btn" onclick="checkout()">Оформить</button><button class="ghost" onclick="closeModal()">Продолжить покупки</button></div>;
+      }
+      modalContent.innerHTML = html;
+      backdrop.style.display='flex';
+      backdrop.setAttribute('aria-hidden','false');
+    });
+
+    function removeFromCart(id){
+      cart = cart.filter(c=>c.id!==id);
+      updateCartUI();
+      // reopen cart modal content
+      $('#cartBtn').click();
+    }
+
+    function checkout(){
+      // demo checkout
+      alert('Форма оформления (демо). Можно подключить платёжный шлюз или отправку заказа на почту/API.');
+      cart = [];
+      updateCartUI();
+      closeModal();
+    }
+
+    // contact form demo
+    $('#contactForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = $('#name').value.trim();
+      const phone = $('#phone').value.trim();
+      if(!name || !phone) return alert('Заполните форму');
+      alert('Спасибо, ' + name + '. Мы свяжемся по номеру ' + phone);
+      $('#contactForm').reset();
+    });
+
+    // init
+    function init(){
+      renderProducts();
+      document.getElementById('year').textContent = new Date().getFullYear();
+    }
+    init();
+
+    // accessibility: close modal on Esc
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
